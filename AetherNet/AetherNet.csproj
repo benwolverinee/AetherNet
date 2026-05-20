@@ -1,4 +1,4 @@
-ï»¿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -8,7 +8,7 @@
     <UseWPF>true</UseWPF>
     <ApplicationManifest>Resources\app.manifest</ApplicationManifest>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <Version>1.0.0</Version>
+    <Version>1.1</Version>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -35,9 +35,9 @@
     </ProjectReference>
   </ItemGroup>
 
-  <!-- Build sonrasÄ± dosyalarÄ± organize et -->
+  <!-- Build sonrasý dosyalarý organize et -->
   <Target Name="OrganizeOutput" AfterTargets="Build">
-    <!-- Servis dosyalarÄ±nÄ± kopyala -->
+    <!-- Servis dosyalarýný kopyala -->
     <ItemGroup>
       <ServiceFiles Include="..\AetherNet.Service\bin\$(Configuration)\net8.0-windows\AetherNet.Service.exe" />
       <ServiceFiles Include="..\AetherNet.Service\bin\$(Configuration)\net8.0-windows\AetherNet.Service.dll" />
@@ -49,13 +49,13 @@
     </ItemGroup>
     <Copy SourceFiles="@(ServiceFiles)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
     
-    <!-- WinDivert dosyalarÄ±nÄ± Native klasÃ¶rÃ¼nde tut -->
+    <!-- WinDivert dosyalarýný Native klasöründe tut -->
     <MakeDir Directories="$(OutDir)Native" />
     
-    <!-- lib klasÃ¶rÃ¼nÃ¼ sil -->
+    <!-- lib klasörünü sil -->
     <RemoveDir Condition="Exists('$(OutDir)lib')" Directories="$(OutDir)lib" />
     
-    <!-- Gereksiz dosyalarÄ± sil -->
+    <!-- Gereksiz dosyalarý sil -->
     <Delete Files="$(OutDir)appsettings.json;$(OutDir)appsettings.Development.json" />
     <Delete Condition="Exists('$(OutDir)WinDivert.dll')" Files="$(OutDir)WinDivert.dll" />
     <Delete Condition="Exists('$(OutDir)WinDivert64.sys')" Files="$(OutDir)WinDivert64.sys" />
