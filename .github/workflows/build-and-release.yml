@@ -1,0 +1,77 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'AetherNet/**'
+      - 'AetherNet.Service/**'
+      - 'version.json'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+    
+    - name: Get version
+      id: version
+      run: |
+        $version = (Get-Content version.json | ConvertFrom-Json).Version
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        echo "Version: $version"
+    
+    - name: Restore dependencies
+      run: dotnet restore AetherNet.sln
+    
+    - name: Build
+      run: dotnet build AetherNet.sln -c Release --no-restore
+    
+    - name: Publish AetherNet
+      run: dotnet publish AetherNet/AetherNet.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+    
+    - name: Publish Service
+      run: dotnet publish AetherNet.Service/AetherNet.Service.csproj -c Release -r win-x64 --self-contained false -o publish
+    
+    - name: Copy Native files
+      run: |
+        mkdir publish\Native
+        copy AetherNet\Native\goodbyedpi.exe publish\Native\
+        copy AetherNet\Native\WinDivert.dll publish\Native\
+        copy AetherNet\Native\WinDivert64.sys publish\Native\
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.version.outputs.VERSION }}
+        name: AetherNet v${{ steps.version.outputs.VERSION }}
+        body: |
+          ## AetherNet v${{ steps.version.outputs.VERSION }}
+          
+          ### Yenilikler
+          - Otomatik güncelleme
+          - Discord, Telegram ve tüm engellenmiş siteler için DPI bypass
+          
+          ### Kurulum
+          1. AetherNet.exe'yi indir
+          2. Yönetici olarak çalıştır
+          3. "Servis Yükle" butonuna tıkla
+          4. "BAŞLAT" butonuna tıkla
+          
+          ### Güncelleme
+          Uygulama otomatik olarak güncellemeleri kontrol eder.
+        files: |
+          publish/AetherNet.exe
+          publish/AetherNet.Service.exe
+          publish/Native/*
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
