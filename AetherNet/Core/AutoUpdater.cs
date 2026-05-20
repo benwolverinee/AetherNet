@@ -9,8 +9,8 @@ namespace AetherNet.Core
 {
     public class AutoUpdater
     {
-        private const string UPDATE_URL = "https://raw.githubusercontent.com/benwolverinee/AetherNet/main/version.json";
-        private const string DOWNLOAD_URL = "https://github.com/benwolverinee/AetherNet/releases/latest/download/AetherNet.exe";
+        private const string UPDATE_URL = "https://raw.githubusercontent.com/benwolverinee/AetherNet-Releases/main/version.json";
+        private const string DOWNLOAD_URL = "https://github.com/benwolverinee/AetherNet-Releases/releases/latest/download/AetherNet.exe";
         private static readonly HttpClient _httpClient = new HttpClient();
 
         public static async Task<bool> CheckForUpdates()
