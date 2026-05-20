@@ -196,15 +196,7 @@ namespace AetherNet.Views
         private void UpdateModeDescription()
         {
             if (ModeDescription == null) return;
-
-            if (WhitelistMode?.IsChecked == true)
-            {
-                ModeDescription.Text = "Whitelist: Sadece seçilen uygulamalar bypass kullanır. Web tarayıcıları otomatik bypass kullanır.";
-            }
-            else
-            {
-                ModeDescription.Text = "Blacklist: Seçilen uygulamalar HARİÇ tüm uygulamalar bypass kullanır (oyunları ekleyin)";
-            }
+            ModeDescription.Text = "";
         }
 
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
