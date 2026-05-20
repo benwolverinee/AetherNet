@@ -36,15 +36,14 @@ copy "AetherNet\Native\goodbyedpi.exe" "publish\Native\" /Y
 copy "AetherNet\Native\WinDivert.dll" "publish\Native\" /Y
 copy "AetherNet\Native\WinDivert64.sys" "publish\Native\" /Y
 
-dotnet publish AetherNet.Service\AetherNet.Service.csproj -c Release -r win-x64 --self-contained false -o publish
+dotnet publish AetherNet.Service\AetherNet.Service.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
 
 REM Release klasoru olustur
 if not exist "releases" mkdir "releases"
 if not exist "releases\v%NEW_VERSION%" mkdir "releases\v%NEW_VERSION%"
 
-copy "publish\AetherNet.exe" "releases\v%NEW_VERSION%\" /Y
-xcopy "publish\Native" "releases\v%NEW_VERSION%\Native\" /E /I /Y
-copy "publish\AetherNet.Service.exe" "releases\v%NEW_VERSION%\" /Y
+REM Tum dosyalari kopyala
+xcopy "publish\*.*" "releases\v%NEW_VERSION%\" /E /I /Y
 
 REM README olustur
 echo # AetherNet v%NEW_VERSION% > "releases\v%NEW_VERSION%\README.md"
@@ -93,12 +92,14 @@ echo    git commit -m "Update to v%NEW_VERSION%"
 echo    git push
 echo.
 echo 2. GitHub Release olustur (exe 100MB'dan buyuk, git push calismaz):
-echo    gh release create v%NEW_VERSION% "releases\v%NEW_VERSION%\AetherNet.exe" --repo benwolverinee/AetherNet-Releases --title "AetherNet v%NEW_VERSION%" --notes "Discord ve engellenmiş siteler için DPI bypass"
+echo    Tum klasoru zip'le: releases\v%NEW_VERSION%
+echo    gh release create v%NEW_VERSION% "releases\v%NEW_VERSION%.zip" --repo benwolverinee/AetherNet-Releases --title "AetherNet v%NEW_VERSION%" --notes "Discord ve engellenmiş siteler için DPI bypass"
 echo.
 echo VEYA manuel:
+echo    - releases\v%NEW_VERSION% klasorunu zip'le
 echo    - https://github.com/benwolverinee/AetherNet-Releases/releases/new
 echo    - Tag: v%NEW_VERSION%
 echo    - Title: AetherNet v%NEW_VERSION%
-echo    - Upload: releases\v%NEW_VERSION%\AetherNet.exe
+echo    - Upload: releases\v%NEW_VERSION%.zip
 echo.
 pause
