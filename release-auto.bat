@@ -1,8 +1,20 @@
 @echo off
 echo ========================================
-echo AetherNet Public Release
+echo AetherNet Otomatik Release
 echo ========================================
 echo.
+
+REM GitHub CLI kontrolu
+where gh >nul 2>nul
+if %ERRORLEVEL% NEQ 0 (
+    echo HATA: GitHub CLI yuklu degil!
+    echo.
+    echo Yuklemek icin: https://cli.github.com/
+    echo.
+    echo Veya release-public.bat kullan (manuel)
+    pause
+    exit /b 1
+)
 
 REM Version'u oku
 for /f "tokens=2 delims=:, " %%a in ('findstr /C:"Version" version.json') do set VERSION=%%~a
@@ -43,32 +55,22 @@ if not exist "releases" mkdir "releases"
 if not exist "releases\v%NEW_VERSION%" mkdir "releases\v%NEW_VERSION%"
 
 copy "publish\AetherNet.exe" "releases\v%NEW_VERSION%\" /Y
-xcopy "publish\Native" "releases\v%NEW_VERSION%\Native\" /E /I /Y
-copy "publish\AetherNet.Service.exe" "releases\v%NEW_VERSION%\" /Y
 
-REM README olustur
-echo # AetherNet v%NEW_VERSION% > "releases\v%NEW_VERSION%\README.md"
-echo. >> "releases\v%NEW_VERSION%\README.md"
-echo Discord, Telegram ve engellenmiş siteler için DPI bypass aracı. >> "releases\v%NEW_VERSION%\README.md"
-echo. >> "releases\v%NEW_VERSION%\README.md"
-echo ## Kurulum >> "releases\v%NEW_VERSION%\README.md"
-echo. >> "releases\v%NEW_VERSION%\README.md"
-echo 1. AetherNet.exe'yi indir >> "releases\v%NEW_VERSION%\README.md"
-echo 2. Yönetici olarak çalıştır >> "releases\v%NEW_VERSION%\README.md"
-echo 3. "Servis Yükle" butonuna tıkla >> "releases\v%NEW_VERSION%\README.md"
-echo 4. "BAŞLAT" butonuna tıkla >> "releases\v%NEW_VERSION%\README.md"
-
-REM Private repo'ya commit (sadece kod)
+REM Private repo'ya commit
+echo.
+echo ========================================
+echo Private repo guncelleniyor...
+echo ========================================
 git add .
 git commit -m "Release v%NEW_VERSION%"
 git push
 
+REM Public releases repo icin version.json olustur
 echo.
 echo ========================================
-echo PUBLIC RELEASE HAZIRLANIYOR...
+echo Public repo hazirlaniyor...
 echo ========================================
 
-REM Public releases repo icin version.json olustur
 if not exist "D:\AetherNet-Releases" mkdir "D:\AetherNet-Releases"
 
 echo { > "D:\AetherNet-Releases\version.json"
@@ -76,29 +78,30 @@ echo   "Version": "%NEW_VERSION%", >> "D:\AetherNet-Releases\version.json"
 echo   "DownloadUrl": "https://github.com/benwolverinee/AetherNet-Releases/releases/latest/download/AetherNet.exe" >> "D:\AetherNet-Releases\version.json"
 echo } >> "D:\AetherNet-Releases\version.json"
 
+REM Public repo'ya version.json yukle
+cd D:\AetherNet-Releases
+git add version.json
+git commit -m "Update to v%NEW_VERSION%"
+git push
+
+REM GitHub Release olustur ve exe yukle
+echo.
+echo ========================================
+echo GitHub Release olusturuluyor...
+echo ========================================
+
+cd %~dp0
+gh release create v%NEW_VERSION% "releases\v%NEW_VERSION%\AetherNet.exe" --repo benwolverinee/AetherNet-Releases --title "AetherNet v%NEW_VERSION%" --notes "Discord, Telegram ve engellenmiş siteler için DPI bypass aracı.%0A%0AKurulum:%0A1. AetherNet.exe'yi indir%0A2. Yönetici olarak çalıştır%0A3. 'Servis Yükle' butonuna tıkla%0A4. 'BAŞLAT' butonuna tıkla"
+
 echo.
 echo ========================================
 echo TAMAMLANDI!
 echo ========================================
 echo.
-echo Build dosyalari: releases\v%NEW_VERSION%\
-echo Public repo dosyasi: D:\AetherNet-Releases\version.json
+echo Private repo: https://github.com/benwolverinee/AetherNet
+echo Public releases: https://github.com/benwolverinee/AetherNet-Releases/releases
 echo.
-echo SIMDI YAPILACAKLAR:
-echo.
-echo 1. Public repo'ya version.json yukle:
-echo    cd D:\AetherNet-Releases
-echo    git add version.json
-echo    git commit -m "Update to v%NEW_VERSION%"
-echo    git push
-echo.
-echo 2. GitHub Release olustur (exe 100MB'dan buyuk, git push calismaz):
-echo    gh release create v%NEW_VERSION% "releases\v%NEW_VERSION%\AetherNet.exe" --repo benwolverinee/AetherNet-Releases --title "AetherNet v%NEW_VERSION%" --notes "Discord ve engellenmiş siteler için DPI bypass"
-echo.
-echo VEYA manuel:
-echo    - https://github.com/benwolverinee/AetherNet-Releases/releases/new
-echo    - Tag: v%NEW_VERSION%
-echo    - Title: AetherNet v%NEW_VERSION%
-echo    - Upload: releases\v%NEW_VERSION%\AetherNet.exe
+echo Kullanicilar buradan indirecek:
+echo https://github.com/benwolverinee/AetherNet-Releases/releases/latest/download/AetherNet.exe
 echo.
 pause
