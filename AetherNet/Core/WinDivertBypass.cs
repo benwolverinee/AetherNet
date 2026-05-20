@@ -14,6 +14,7 @@ namespace AetherNet.Core
             {
                 string basePath = AppDomain.CurrentDomain.BaseDirectory;
                 string goodbyeDpiPath = Path.Combine(basePath, "Native", "goodbyedpi.exe");
+                string blacklistPath = Path.Combine(basePath, "Native", "blacklist.txt");
                 
                 if (!File.Exists(goodbyeDpiPath))
                 {
@@ -21,8 +22,8 @@ namespace AetherNet.Core
                     return false;
                 }
 
-                // GoodbyeDPI parametreleri - Türkiye için (service_install_dnsredir_turkey.cmd'den)
-                string arguments = "-5 --set-ttl 5 --dns-addr 77.88.8.8 --dns-port 1253 --dnsv6-addr 2a02:6b8::feed:0ff --dnsv6-port 1253";
+                // GoodbyeDPI parametreleri - Blacklist modu (sadece Discord ve engellenmiş siteler)
+                string arguments = $"-5 --set-ttl 5 --dns-addr 77.88.8.8 --dns-port 1253 --dnsv6-addr 2a02:6b8::feed:0ff --dnsv6-port 1253 --blacklist \"{blacklistPath}\"";
                 
                 var psi = new ProcessStartInfo
                 {
@@ -43,7 +44,7 @@ namespace AetherNet.Core
                     return false;
                 }
 
-                Debug.WriteLine($"✅ GoodbyeDPI başlatıldı (PID: {_goodbyeDpiProcess.Id}, Turkey Mode)");
+                Debug.WriteLine($"✅ GoodbyeDPI başlatıldı (PID: {_goodbyeDpiProcess.Id}, Blacklist Mode)");
                 return true;
             }
             catch (Exception ex)

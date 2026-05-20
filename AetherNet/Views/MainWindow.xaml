@@ -85,7 +85,7 @@
                 </Button>
 
                 <!-- SERVİS BUTONLARI -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,15">
                     <Button x:Name="InstallServiceBtn" Click="InstallServiceBtn_Click"
                             Content="📦 Servis Yükle"
                             Width="120" Height="32"
@@ -106,17 +106,6 @@
                             Cursor="Hand"
                             Margin="8,0,0,0"/>
                 </StackPanel>
-
-                <!-- UYGULAMA FİLTRELEME -->
-                <Button x:Name="FilterBtn" Click="FilterBtn_Click"
-                        Content="⚙️ Uygulama Filtreleri"
-                        Width="180" Height="32"
-                        FontSize="11" FontWeight="SemiBold"
-                        Foreground="White"
-                        Background="#1E293B"
-                        BorderBrush="#00E5FF" BorderThickness="1.5"
-                        Cursor="Hand"
-                        Margin="0,15,0,15"/>
             </StackPanel>
         </Grid>
     </Border>

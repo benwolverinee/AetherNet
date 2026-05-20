@@ -26,6 +26,9 @@
     <None Update="Native\goodbyedpi.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Native\blacklist.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <!-- Servis projesini referans olarak ekle -->
