@@ -45,7 +45,7 @@
                 </StackPanel>
 
                 <TextBlock x:Name="ModeDescription" 
-                           Text="Whitelist: Sadece seçilen uygulamalar bypass kullanır (Discord, Chrome vs.)"
+                           Text="Whitelist: Sadece seçilen uygulamalar bypass kullanır. Web tarayıcıları otomatik bypass kullanır."
                            FontSize="10" Foreground="#00E5FF" 
                            Margin="0,8,0,0" TextWrapping="Wrap"/>
             </StackPanel>

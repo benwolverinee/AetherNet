@@ -47,16 +47,10 @@ namespace AetherNet.Views
 
         private void LoadDefaultApps()
         {
-            // Varsayılan uygulamalar
+            // Varsayılan sadece Discord
             var defaultApps = new List<string>
             {
-                "Discord.exe",
-                "chrome.exe",
-                "firefox.exe",
-                "msedge.exe",
-                "opera.exe",
-                "brave.exe",
-                "Telegram.exe"
+                "Discord.exe"
             };
 
             // Mevcut uygulamaları ekle
@@ -122,11 +116,10 @@ namespace AetherNet.Views
             if (string.IsNullOrEmpty(appName))
                 return;
 
-            // Varsayılan uygulamaları silme
-            var defaultApps = new[] { "Discord.exe", "chrome.exe", "firefox.exe", "msedge.exe", "Telegram.exe" };
-            if (defaultApps.Contains(appName, StringComparer.OrdinalIgnoreCase))
+            // Varsayılan uygulamaları silme (sadece Discord)
+            if (appName.Equals("Discord.exe", StringComparison.OrdinalIgnoreCase))
             {
-                MessageBox.Show("Varsayılan uygulamalar silinemez!", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Discord varsayılan uygulama, silinemez!", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -206,11 +199,11 @@ namespace AetherNet.Views
 
             if (WhitelistMode?.IsChecked == true)
             {
-                ModeDescription.Text = "Whitelist: Sadece seçilen uygulamalar bypass kullanır (Discord, Chrome vs.)";
+                ModeDescription.Text = "Whitelist: Sadece seçilen uygulamalar bypass kullanır. Web tarayıcıları otomatik bypass kullanır.";
             }
             else
             {
-                ModeDescription.Text = "Blacklist: Seçilen uygulamalar HARİÇ tüm uygulamalar bypass kullanır (COD, Valorant hariç)";
+                ModeDescription.Text = "Blacklist: Seçilen uygulamalar HARİÇ tüm uygulamalar bypass kullanır (oyunları ekleyin)";
             }
         }
 
@@ -223,6 +216,6 @@ namespace AetherNet.Views
     public class FilterConfig
     {
         public string Mode { get; set; } = "whitelist";
-        public List<string> Applications { get; set; } = new List<string>();
+        public List<string> Applications { get; set; } = new List<string> { "Discord.exe" };
     }
 }
