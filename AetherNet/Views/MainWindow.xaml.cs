@@ -189,5 +189,11 @@ namespace AetherNet.Views
             if (_isRunning) _engine.Stop();
             Application.Current.Shutdown();
         }
+
+        private void FilterBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var filterWindow = new FilterWindow();
+            filterWindow.ShowDialog();
+        }
     }
 }
