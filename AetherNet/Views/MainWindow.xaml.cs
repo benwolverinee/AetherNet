@@ -1,0 +1,211 @@
+﻿using System;
+using System.Windows;
+using System.Windows.Media;
+using AetherNet.Core;
+
+namespace AetherNet.Views
+{
+    public partial class MainWindow : Window
+    {
+        private AetherEngine _engine = new AetherEngine();
+        private bool _isRunning = false;
+
+        private readonly SolidColorBrush ColorRed = new SolidColorBrush(Color.FromRgb(255, 76, 76));
+        private readonly SolidColorBrush ColorGreen = new SolidColorBrush(Color.FromRgb(105, 240, 174));
+        private readonly SolidColorBrush ColorOrange = new SolidColorBrush(Color.FromRgb(255, 107, 0));
+        private readonly SolidColorBrush ColorYellow = new SolidColorBrush(Color.FromRgb(255, 184, 0));
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            UpdateServiceButtonStates();
+            
+            // Güncelleme kontrolünü arka planda yap
+            Task.Run(async () => await CheckForUpdates());
+        }
+
+        private async Task CheckForUpdates()
+        {
+            try
+            {
+                bool updateAvailable = await AutoUpdater.CheckForUpdates();
+                
+                if (updateAvailable)
+                {
+                    // UI thread'de çalıştır
+                    await Dispatcher.InvokeAsync(() =>
+                    {
+                        var result = MessageBox.Show(
+                            "🔄 Yeni güncelleme mevcut!\n\nŞimdi güncellemek ister misiniz?",
+                            "Güncelleme",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Information);
+
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            Task.Run(async () =>
+                            {
+                                bool success = await AutoUpdater.DownloadAndInstallUpdate();
+                                
+                                if (success)
+                                {
+                                    await Dispatcher.InvokeAsync(() => Application.Current.Shutdown());
+                                }
+                                else
+                                {
+                                    await Dispatcher.InvokeAsync(() =>
+                                    {
+                                        MessageBox.Show(
+                                            "Güncelleme başarısız oldu.",
+                                            "Hata",
+                                            MessageBoxButton.OK,
+                                            MessageBoxImage.Error);
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+            catch { }
+        }
+
+        private void UpdateServiceButtonStates()
+        {
+            bool isInstalled = _engine.IsServiceInstalled();
+            InstallServiceBtn.IsEnabled = !isInstalled;
+            UninstallServiceBtn.IsEnabled = isInstalled;
+
+            if (isInstalled)
+            {
+                InstallServiceBtn.Opacity = 0.5;
+                UninstallServiceBtn.Opacity = 1.0;
+            }
+            else
+            {
+                InstallServiceBtn.Opacity = 1.0;
+                UninstallServiceBtn.Opacity = 0.5;
+            }
+        }
+
+        private void ToggleBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (!_isRunning)
+            {
+                try
+                {
+                    _engine.Start();
+                    _isRunning = true;
+
+                    ToggleBtn.Content = "DURDUR";
+                    StatusText.Text = "Sistem Aktif";
+                    StatusText.Foreground = ColorGreen;
+                }
+                catch (Exception ex)
+                {
+                    UpdateServiceButtonStates(); // Buton durumlarını güncelle
+                    MessageBox.Show(ex.Message, "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                _engine.Stop();
+                _isRunning = false;
+
+                ToggleBtn.Content = "BASLAT";
+                StatusText.Text = "Sistem Kapali";
+                StatusText.Foreground = ColorOrange;
+            }
+        }
+
+        private void InstallServiceBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var result = MessageBox.Show(
+                    "AetherNet servisi yüklenecek.\n\n" +
+                    "✅ Manuel başlatma (BAŞLAT butonu ile)\n" +
+                    "✅ PC yeniden başlatılsa bile yüklü kalır\n\n" +
+                    "Devam?",
+                    "Servis Yükleme",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    _engine.InstallService();
+                    UpdateServiceButtonStates();
+                    
+                    MessageBox.Show(
+                        "✅ Servis yüklendi!\n\nŞimdi 'BAŞLAT' butonuna basın.",
+                        "Başarılı",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Hata:\n\n" + ex.Message,
+                    "Hata",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private void UninstallServiceBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var result = MessageBox.Show(
+                    "Servis kaldırılacak.\n\nDevam?",
+                    "Servis Kaldırma",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    if (_isRunning)
+                    {
+                        _engine.Stop();
+                        _isRunning = false;
+                        ToggleBtn.Content = "BASLAT";
+                        StatusText.Text = "Sistem Kapali";
+                        StatusText.Foreground = ColorOrange;
+                    }
+
+                    _engine.UninstallService();
+                    UpdateServiceButtonStates();
+                    
+                    MessageBox.Show(
+                        "✅ Servis kaldırıldı!",
+                        "Başarılı",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Hata:\n\n" + ex.Message,
+                    "Hata",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private void CloseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (_isRunning) _engine.Stop();
+            Application.Current.Shutdown();
+        }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ButtonState == System.Windows.Input.MouseButtonState.Pressed)
+            {
+                this.DragMove();
+            }
+        }
+    }
+}
