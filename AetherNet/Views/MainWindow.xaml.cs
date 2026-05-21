@@ -12,16 +12,19 @@ namespace AetherNet.Views
 
         private readonly SolidColorBrush ColorRed = new SolidColorBrush(Color.FromRgb(255, 76, 76));
         private readonly SolidColorBrush ColorGreen = new SolidColorBrush(Color.FromRgb(105, 240, 174));
-        private readonly SolidColorBrush ColorCyan = new SolidColorBrush(Color.FromRgb(0, 229, 255));
+        private readonly SolidColorBrush ColorOrange = new SolidColorBrush(Color.FromRgb(255, 107, 0));
+        private readonly SolidColorBrush ColorYellow = new SolidColorBrush(Color.FromRgb(255, 184, 0));
 
         public MainWindow()
         {
             InitializeComponent();
             UpdateServiceButtonStates();
-            CheckForUpdates();
+            
+            // Güncelleme kontrolünü arka planda yap
+            Task.Run(async () => await CheckForUpdates());
         }
 
-        private async void CheckForUpdates()
+        private async Task CheckForUpdates()
         {
             try
             {
@@ -29,29 +32,39 @@ namespace AetherNet.Views
                 
                 if (updateAvailable)
                 {
-                    var result = MessageBox.Show(
-                        "🔄 Yeni güncelleme mevcut!\n\nŞimdi güncellemek ister misiniz?",
-                        "Güncelleme",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Information);
-
-                    if (result == MessageBoxResult.Yes)
+                    // UI thread'de çalıştır
+                    await Dispatcher.InvokeAsync(() =>
                     {
-                        bool success = await AutoUpdater.DownloadAndInstallUpdate();
-                        
-                        if (success)
+                        var result = MessageBox.Show(
+                            "🔄 Yeni güncelleme mevcut!\n\nŞimdi güncellemek ister misiniz?",
+                            "Güncelleme",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Information);
+
+                        if (result == MessageBoxResult.Yes)
                         {
-                            Application.Current.Shutdown();
+                            Task.Run(async () =>
+                            {
+                                bool success = await AutoUpdater.DownloadAndInstallUpdate();
+                                
+                                if (success)
+                                {
+                                    await Dispatcher.InvokeAsync(() => Application.Current.Shutdown());
+                                }
+                                else
+                                {
+                                    await Dispatcher.InvokeAsync(() =>
+                                    {
+                                        MessageBox.Show(
+                                            "Güncelleme başarısız oldu.",
+                                            "Hata",
+                                            MessageBoxButton.OK,
+                                            MessageBoxImage.Error);
+                                    });
+                                }
+                            });
                         }
-                        else
-                        {
-                            MessageBox.Show(
-                                "Güncelleme başarısız oldu.",
-                                "Hata",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Error);
-                        }
-                    }
+                    });
                 }
             }
             catch { }
@@ -85,8 +98,7 @@ namespace AetherNet.Views
                     _isRunning = true;
 
                     ToggleBtn.Content = "DURDUR";
-                    ToggleBtn.BorderBrush = ColorRed;
-                    StatusText.Text = "Sistem Aktif - DPI Bypass Calisiyor";
+                    StatusText.Text = "Sistem Aktif";
                     StatusText.Foreground = ColorGreen;
                 }
                 catch (Exception ex)
@@ -101,9 +113,8 @@ namespace AetherNet.Views
                 _isRunning = false;
 
                 ToggleBtn.Content = "BASLAT";
-                ToggleBtn.BorderBrush = ColorCyan;
                 StatusText.Text = "Sistem Kapali";
-                StatusText.Foreground = ColorRed;
+                StatusText.Foreground = ColorOrange;
             }
         }
 
@@ -159,9 +170,8 @@ namespace AetherNet.Views
                         _engine.Stop();
                         _isRunning = false;
                         ToggleBtn.Content = "BASLAT";
-                        ToggleBtn.BorderBrush = ColorCyan;
                         StatusText.Text = "Sistem Kapali";
-                        StatusText.Foreground = ColorRed;
+                        StatusText.Foreground = ColorOrange;
                     }
 
                     _engine.UninstallService();
@@ -188,6 +198,14 @@ namespace AetherNet.Views
         {
             if (_isRunning) _engine.Stop();
             Application.Current.Shutdown();
+        }
+
+        private void TitleBar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ButtonState == System.Windows.Input.MouseButtonState.Pressed)
+            {
+                this.DragMove();
+            }
         }
     }
 }
