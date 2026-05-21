@@ -2,7 +2,6 @@
 
 GoodbyeDPI tabanlı, VPN kullanmadan ve internet hızından ödün vermeden Discord ve diğer erişim kısıtlı platformlara bağlanmanızı sağlar. Windows App ve Console olarak iki versiyon mevcuttur.
 Oyunlar etkilenmez.
----
 
 <table align="center">
   <tr>
