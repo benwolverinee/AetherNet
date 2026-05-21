@@ -1,7 +1,0 @@
-discord.com
-discordapp.com
-discord.gg
-cdn.discordapp.com
-gateway.discord.gg
-status.discord.com
-support.discord.com
