@@ -3,14 +3,22 @@
 GoodbyeDPI tabanlı, VPN kullanmadan ve internet hızından ödün vermeden Discord ve diğer erişim kısıtlı platformlara bağlanmanızı sağlar. Windows App ve Console olarak iki versiyon mevcuttur.
 Oyunlar etkilenmez.
 
-<table align="center">
+  <table align="center">
   <tr>
-    <td align="center"><b>Console</b></td>
-    <td align="center"><b>App</b></td>
+    <th>Console</th>
+    <th>App</th>
+    <th>Kaynak</th>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/a198e3fb-a62f-418d-8336-e68cd19ceba7" width="400"/></td>
-    <td><img src="https://github.com/user-attachments/assets/cfd1b4d9-9db4-48b8-8dfe-ac2ba01b90e9" width="400"/></td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/a198e3fb-a62f-418d-8336-e68cd19ceba7" width="100%">
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/cfd1b4d9-9db4-48b8-8dfe-ac2ba01b90e9" width="100%">
+    </td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/3951f060-9519-4d4b-9b61-90fddeeb35b4" width="100%">
+    </td>
   </tr>
 </table>
 
