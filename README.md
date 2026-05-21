@@ -1,8 +1,19 @@
 # AetherNet
 
 GoodbyeDPI tabanlı, VPN kullanmadan ve internet hızından ödün vermeden Discord ve diğer erişim kısıtlı platformlara bağlanmanızı sağlar. Windows App ve Console olarak iki versiyon mevcuttur.
-
+Oyunlar etkilenmez.
 ---
+
+<table align="center">
+  <tr>
+    <td align="center"><b>Console</b></td>
+    <td align="center"><b>App</b></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/a198e3fb-a62f-418d-8336-e68cd19ceba7" width="400"/></td>
+    <td><img src="https://github.com/user-attachments/assets/cfd1b4d9-9db4-48b8-8dfe-ac2ba01b90e9" width="400"/></td>
+  </tr>
+</table>
 
 ## ⬇️ İndirme
 
@@ -10,8 +21,8 @@ GoodbyeDPI tabanlı, VPN kullanmadan ve internet hızından ödün vermeden Disc
 
 | Versiyon | Dosya |
 |----------|-------|
-| GUI (App) | `AetherNet.exe` |
-| Console | `AetherNet-CLI.zip` |
+| GUI (App) | `AetherNetApp.zip` |
+| Console | `AetherNetConsole.zip` |
 
 ---
 
@@ -32,17 +43,16 @@ Uygulama kapatıldığında sistem tepsisine küçülür.
 
 **Gereksinimler:** Windows 7/10/11 · Yönetici yetkisi *(otomatik alınır)*
 
-`AetherNet.cmd` veya `AetherNet.bat` dosyasını çalıştırın.
+**Kullanım:**
+`AetherNet.exe` dosyasını çalıştır ve `[1]` seç.
 
 ```
-[1] Servisi Yukle     ← İlk kurulumda bir kez
-[2] Servisi Kaldir
-[3] Sistemi Baslat
-[4] Sistemi Durdur
-[5] Cikis
+[1] Servisi Yukle     ← İlk kurulumda bir kez Otomatik "Sistemi Baslatir"
+[2] Servisi Kaldir    ← Manuel olarak servisi kaldirabilirsiniz.
+[3] Sistemi Baslat    ← Manuel olarak servisi başlatabilirsiniz.
+[4] Sistemi Durdur    ← Manuel olarak servisi durdurabilirsiniz.
+[5] Cikis             ← Konsolu kapatir
 ```
-
-**İlk kullanım:** Önce `[1]`, sonra `[3]` seç.
 
 ---
 
