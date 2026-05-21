@@ -1,0 +1,108 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationManifest>Resources\app.manifest</ApplicationManifest>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Version>1.0</Version>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    
+    <!-- RAM ve performans optimizasyonu -->
+    <TieredCompilation>true</TieredCompilation>
+    <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <RetainVMGarbageCollection>false</RetainVMGarbageCollection>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+    
+    <!-- Build hızlandırma -->
+    <UseSharedCompilation>true</UseSharedCompilation>
+    <BuildInParallel>true</BuildInParallel>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  
+  <!-- Release için agresif optimizasyon -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="Native\WinDivert.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Native\WinDivert64.sys">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Native\goodbyedpi.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Native\blacklist.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- Tema dosyalarını build'den çıkar -->
+  <ItemGroup>
+    <None Include="Views\MainWindow.Noredia.xaml" />
+    <None Include="Views\MainWindow.Borsa.xaml" />
+  </ItemGroup>
+
+  <!-- Servis projesini referans olarak ekle -->
+  <ItemGroup>
+    <ProjectReference Include="..\AetherNet.Service\AetherNet.Service.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+
+  <!-- Build sonras� dosyalar� organize et -->
+  <Target Name="OrganizeOutput" AfterTargets="Build">
+    <!-- Servis dosyalar�n� kopyala -->
+    <ItemGroup>
+      <ServiceFiles Include="..\AetherNet.Service\bin\$(Configuration)\net8.0-windows\AetherNet.Service.exe" />
+      <ServiceFiles Include="..\AetherNet.Service\bin\$(Configuration)\net8.0-windows\AetherNet.Service.dll" />
+      <ServiceFiles Include="..\AetherNet.Service\bin\$(Configuration)\net8.0-windows\AetherNet.Service.runtimeconfig.json" />
+      <ServiceFiles Include="..\AetherNet.Service\bin\$(Configuration)\net8.0-windows\AetherNet.Service.deps.json" />
+      <ServiceFiles Include="..\AetherNet.Service\bin\$(Configuration)\net8.0-windows\AetherNet.Service.pdb" />
+      <ServiceFiles Include="..\AetherNet.Service\bin\$(Configuration)\net8.0-windows\Microsoft.Extensions.*.dll" />
+      <ServiceFiles Include="..\AetherNet.Service\bin\$(Configuration)\net8.0-windows\System.Diagnostics.*.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ServiceFiles)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+    
+    <!-- WinDivert dosyalar�n� Native klas�r�nde tut -->
+    <MakeDir Directories="$(OutDir)Native" />
+    
+    <!-- lib klas�r�n� sil -->
+    <RemoveDir Condition="Exists('$(OutDir)lib')" Directories="$(OutDir)lib" />
+    
+    <!-- Gereksiz dosyalar� sil -->
+    <Delete Files="$(OutDir)appsettings.json;$(OutDir)appsettings.Development.json" />
+    <Delete Condition="Exists('$(OutDir)WinDivert.dll')" Files="$(OutDir)WinDivert.dll" />
+    <Delete Condition="Exists('$(OutDir)WinDivert64.sys')" Files="$(OutDir)WinDivert64.sys" />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App.WPF" />
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" />
+  </ItemGroup>
+
+</Project>
